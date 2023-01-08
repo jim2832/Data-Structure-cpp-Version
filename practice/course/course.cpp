@@ -1,19 +1,25 @@
 #include <iostream>
-
+#include <stdlib.h>
 using namespace std;
 
 class Course{
-    string lecturer;
-    int student_number;
-    float *score;
+    friend void print(Course&);
 
-    void set_lecturer(string);
-    string get_lecturer();
-    void set_student_number(int);
-    int get_student_number();
-    void set_score_list(float*);
-    float* get_score_list();
-    float average();
+    private:
+        string lecturer;
+        int student_number;
+        float *score;
+    
+    public:
+        void set_lecturer(string);
+        string get_lecturer();
+        void set_student_number(int);
+        int get_student_number();
+        void set_score_list(float*);
+        float* get_score_list();
+        float average();
+        Course(string = "unknown", int = 0, float* = 0); //建構式
+        ~Course(); //解構式
 };
 
 void Course::set_lecturer(string name){
@@ -42,14 +48,49 @@ float* Course::get_score_list(){
 
 float Course::average(){
     float sum = 0;
-    for(int i=0;i<student_number;i++){
+    for(int i=0; i<student_number; i++){
         sum += *(score+i);
     }
     sum /= student_number;
     return sum;
 }
 
+//外部function
+void print(Course& c){
+    cout << "Lecturer:" << c.lecturer << endl;
+    cout << "Student number:" << c.student_number << endl;
+
+    for(int i=0; i<c.student_number; i++){
+        cout << i+1 << "-th:" << *(c.score+i) << endl;
+    }
+}
+
+//建構式
+Course::Course(string name, int number, float* score_list){
+    lecturer = name;
+    student_number = number;
+    if(number!= 0 && score_list == 0){
+        score = (float*) calloc(number, sizeof(float));
+    }
+    else{
+        score = score_list;
+    }
+}
+
+//解構式
+Course::~Course(){
+    cout << "Course finished!" << endl;
+    free(score);
+}
+
 int main(){
+    float score[5] = {85,95,60,82,78};
+    Course math("LKM", 5, score);
+    // math.set_lecturer("LKM");
+    // math.set_student_number(5);
+    // math.set_score_list(score);
+
+    print(math);
 
     return 0;
 }
