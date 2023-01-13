@@ -1,5 +1,5 @@
-#ifndef VECTOR_H_INCLUDED
-#define VECTOR_H_INCLUDED
+#ifndef IMPROVED_VECTOR_H_INCLUDED
+#define IMPROVED_VECTOR_H_INCLUDED
 
 #include <iostream>
 #include <string>
@@ -85,14 +85,21 @@ bool Vector<T>::Empty(){
 
 template <typename T>
 void Vector<T>::Push_Back(T data){
-    Len++; //先將長度+1
-    T* temp = (T*) malloc(sizeof(T) * Len); //配置一塊新的記憶體空間
-    for(int i=0; i<Len-1; i++){ //把舊資料搬移過去
-        *(temp + i) = *(Pointer + i);
+    //如果容量還夠
+    if(Len < Capacity){
+        *(Pointer + Len) = data;
     }
-    *(temp + Len - 1) = data; //新增的資料
-    free(Pointer); //釋放舊的空間
-    Pointer = temp;
+    //若容量已經不夠
+    else{
+        if(Capacity == 0){
+            Reserve(1);
+        }
+        else{
+            Reserve(Capacity * 2);
+            *(Pointer + Len) = data;
+        }
+    }
+    Len++; //將長度+1
 }
 
 template <typename T>
@@ -100,13 +107,7 @@ void Vector<T>::Pop_Back(){
     //例外處理
     if(Empty()) return;
     
-    Len--; //先將長度-1
-    T* temp = (T*) malloc(sizeof(T) * Len); //配置一塊新的記憶體空間
-    for(int i=0; i<Len; i++){ //把舊資料搬移過去
-        *(temp + i) = *(Pointer + i);
-    }
-    free(Pointer); //釋放舊的空間
-    Pointer = temp;
+    Len--; //長度-1
 }
 
 template <typename T>
@@ -115,21 +116,22 @@ void Vector<T>::Insert(int index, T data){
     if(index > Size()) return;
     if(index < 0) return;
 
-    Len++; //先將長度+1
-    T* temp = (T*) malloc(sizeof(T) * Len); //配置一塊新的記憶體空間
-    for(int i=0; i<Len; i++){ //把舊資料搬移過去
-        if(i <index){
-            *(temp + i) = *(Pointer + i);
-        }
-        else if(i == index){
-            *(temp + i) = data;
+    //如果已經滿了
+    if(Len == Capacity){
+        if(Capacity == 0){
+            Capacity = 1;
         }
         else{
-            *(temp + i) = *(Pointer + i - 1);
+            Reserve(Capacity * 2);
         }
     }
-    free(Pointer); //釋放舊的空間
-    Pointer = temp;
+
+    //把舊資料搬移過去
+    for(int i=Len-1; i>=index; i--){
+        *(Pointer + i + 1) = *(Pointer + i); //index之後的都要往後移
+    }
+    *(Pointer + index) = data;
+    Len++;
 }
 
 template <typename T>
@@ -139,21 +141,13 @@ void Vector<T>::Erase(int index){
     if(index >= Size()) return;
     if(index < 0) return;
 
-    Len--; //先將長度-1
-    T* temp = (T*) malloc(sizeof(T) * Len); //配置一塊新的記憶體空間
-    for(int i=0; i<Len; i++){ //把舊資料搬移過去
-        if(i < index){
-            *(temp + i) = *(Pointer + i);
-        }
-        // else if(i == index){
-        //     continue;
-        // }
-        else{
-            *(temp + i) = *(Pointer + i + 1);
-        }
+    // 1 2 3 4 5
+    // delete index 1
+    // 1 3 4 5 5
+    for(int i=index+1; i<Len; i++){
+        *(Pointer + i - 1) = *(Pointer + i);
     }
-    free(Pointer); //釋放舊的空間
-    Pointer = temp;
+    Len--; //先將長度-1
 }
 
 template <typename T>
@@ -171,24 +165,17 @@ void Vector<T>::Erase(int start, int end){
     if(end <= start) return;
     if(start < 0) return;
 
-    Len -= end - start; //要刪除end-start筆資料
-    T* temp = (T*) malloc(sizeof(T) * Len); //配置一塊新的記憶體空間
-    for(int i=0; i<Len; i++){ //把舊資料搬移過去
-        if(i < start){
-            *(temp + i) = *(Pointer + i);
-        }
-        else{
-            *(temp + i) = *(Pointer + i + (end - start));
-        }
+    for(int i=end; i<Len; i++){
+        *(Pointer + i + (end - start)) = *(Pointer + i);
     }
-    free(Pointer); //釋放舊的空間
-    Pointer = temp;
+    Len -= end - start; //要刪除end-start筆資料
 }
 
 template <typename T>
 void Vector<T>::Clear(){
     free(Pointer);
     Len = 0;
+    Capacity = 0;
 }
 
 template <typename T>
