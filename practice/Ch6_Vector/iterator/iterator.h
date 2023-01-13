@@ -25,10 +25,17 @@ class Vector{
                 void operator--(); //--Iterator
                 void operator++(int); // Iterator++
                 void operator--(int); // Iterator--
-                bool operator==(Iterator&); //重載==
-                bool operator!=(Iterator&); //重載!=
-                void operator=(Iterator&); //重載=
-                T operator*(); //重載*
+                void operator=(Iterator); //Iterator=
+                bool operator==(Iterator); //Iterator==
+                bool operator!=(Iterator); //Iterator!=
+                bool operator>(Iterator); //Iterator>
+                bool operator<(Iterator); //Iterator<
+                bool operator>=(Iterator); //Iterator>=
+                bool operator<=(Iterator); //Iterator<=
+                T& operator*(); //取值運算子
+                int operator-(Iterator); //回傳兩個迭代器的差
+                Iterator operator+(int); //迭代器的指標(iter)直接 + 一個數字
+                Iterator operator-(int); //迭代器的指標(iter)直接 - 一個數字
         };
 
         Vector(int = 0); //建構式
@@ -41,13 +48,44 @@ class Vector{
         bool Empty(); //判斷是否為空
         void Push_Back(T); //在尾端新增資料
         void Pop_Back(); //從尾端刪除資料
-        void Insert(int, T); //在特定index插入資料
-        void Erase(int); //在特定index刪除資料
-        void Erase(int, int); //在一段範圍內刪除資料
+        void Insert(Iterator, T); //在特定index插入資料
+        void Erase(Iterator); //在特定index刪除資料
+        void Erase(Iterator, Iterator); //在一段範圍內刪除資料
         void Clear(); //清除所有資料
         void Reserve(int); //更改Capacity
         void Resize(int); //更改Len
+        Iterator Begin(); //回傳迭代的第一個結果
+        Iterator End(); //回傳迭代最後一個結果的下一個
 };
+
+/*外部函式*/
+template <typename T>
+typename Vector<T>::Iterator Find(Vector<T> v, T data){
+    for(auto iter=v.Begin(); iter!=v.End(); iter++){
+        if(*iter == data){
+            return iter;
+        }
+    }
+    return v.End();
+}
+
+template <typename T>
+typename Vector<T>::Iterator Remove(Vector<T> v, T target){
+    int count = 0;
+    for(auto iter=v.Begin(); iter!=v.End(); iter++){
+        if(*iter == target){
+            continue;
+        }
+        *(v.Begin() + count) = *iter;
+        count++;
+    }
+
+    for(auto iter=v.Begin()+count; iter!=v.End(); iter++){
+        *iter = target;
+    }
+
+    return v.Begin() + count;
+}
 
 //建構式
 template <typename T>
@@ -124,10 +162,10 @@ void Vector<T>::Pop_Back(){
 }
 
 template <typename T>
-void Vector<T>::Insert(int index, T data){
+void Vector<T>::Insert(Iterator iter2, T data){
     //例外處理
-    if(index > Size()) return;
-    if(index < 0) return;
+    if(iter2 >= End()) return;
+    if(iter2 < Begin()) return;
 
     //如果已經滿了
     if(Len == Capacity){
@@ -140,31 +178,35 @@ void Vector<T>::Insert(int index, T data){
     }
 
     //把舊資料搬移過去
-    for(int i=Len-1; i>=index; i--){
-        *(Pointer + i + 1) = *(Pointer + i); //index之後的都要往後移
+    // 1 2 3 4 5
+    // insert 100 to index 0
+    // 100 1 2 3 4 5
+    auto temp = iter2;
+    for(iter2=End(); iter2>= temp; iter2--){
+        *(iter2 + 1) = *(iter2); //temp之後的都要往後移
     }
-    *(Pointer + index) = data;
+    *(temp) = data;
     Len++;
 }
 
 template <typename T>
-void Vector<T>::Erase(int index){
+void Vector<T>::Erase(Iterator iter2){
     //例外處理
     if(Empty()) return;
-    if(index >= Size()) return;
-    if(index < 0) return;
+    if(iter2 >= End()) return;
+    if(iter2 < Begin()) return;
 
     // 1 2 3 4 5
     // delete index 1
     // 1 3 4 5 5
-    for(int i=index+1; i<Len; i++){
-        *(Pointer + i - 1) = *(Pointer + i);
+    for(iter2++; iter2<End(); iter2++){
+        *(iter2 - 1) = *(iter2);
     }
     Len--; //先將長度-1
 }
 
 template <typename T>
-void Vector<T>::Erase(int start, int end){
+void Vector<T>::Erase(Iterator start, Iterator end){
     //簡易的做法
     /*
     for(int i=start; i<end; i++){
@@ -174,12 +216,16 @@ void Vector<T>::Erase(int start, int end){
 
     //進階的做法
     if(Empty()) return;
-    if(end >= Size()) return;
+    if(end >= End()) return;
     if(end <= start) return;
-    if(start < 0) return;
-
-    for(int i=end; i<Len; i++){
-        *(Pointer + i + (end - start)) = *(Pointer + i);
+    if(start < Begin()) return;
+    
+    // 1 2 3 4 5
+    // delete index 1, 2
+    // 1 4 5 4 5
+    auto temp = end;
+    for(; temp<End(); temp++){
+        *(temp - (end-start)) = *temp;
     }
     Len -= end - start; //要刪除end-start筆資料
 }
@@ -189,6 +235,7 @@ void Vector<T>::Clear(){
     free(Pointer);
     Len = 0;
     Capacity = 0;
+    Pointer = nullptr;
 }
 
 template <typename T>
@@ -214,6 +261,18 @@ void Vector<T>::Resize(int N){
     if(N <= Capacity){
         Len = N;
     }
+}
+
+template <typename T>
+typename Vector<T>::Iterator Vector<T>::Begin(){
+    Iterator result(Pointer);
+    return result;
+}
+
+template <typename T>
+typename Vector<T>::Iterator Vector<T>::End(){
+    Iterator result(Pointer + Len);
+    return result;
 }
 
 /*迭代器的函式*/
@@ -243,23 +302,60 @@ void Vector<T>::Iterator::operator--(int){
 }
 
 template <typename T>
-bool Vector<T>::Iterator::operator==(Iterator& iter2){
-    return iter == iter2.iter;
-}
-
-template <typename T>
-bool Vector<T>::Iterator::operator!=(Iterator& iter2){
-    return iter != iter2.iter;
-}
-
-template <typename T>
-void Vector<T>::Iterator::operator=(Iterator& iter2){
+void Vector<T>::Iterator::operator=(Iterator iter2){
     iter = iter2.iter;
 }
 
 template <typename T>
-T Vector<T>::Iterator::operator*(){
+bool Vector<T>::Iterator::operator==(Iterator iter2){
+    return iter == iter2.iter;
+}
+
+template <typename T>
+bool Vector<T>::Iterator::operator!=(Iterator iter2){
+    return iter != iter2.iter;
+}
+
+template <typename T>
+bool Vector<T>::Iterator::operator>(Iterator iter2){
+    return iter > iter2.iter;
+}
+
+template <typename T>
+bool Vector<T>::Iterator::operator<(Iterator iter2){
+    return iter < iter2.iter;
+}
+
+template <typename T>
+bool Vector<T>::Iterator::operator>=(Iterator iter2){
+    return iter >= iter2.iter;
+}
+
+template <typename T>
+bool Vector<T>::Iterator::operator<=(Iterator iter2){
+    return iter <= iter2.iter;
+}
+
+template <typename T>
+T& Vector<T>::Iterator::operator*(){
     return *iter;
+}
+
+template <typename T>
+int Vector<T>::Iterator::operator-(Iterator iter2){
+    return (iter - iter2.iter);
+}
+
+template <typename T>
+typename Vector<T>::Iterator Vector<T>::Iterator::operator+(int offset){
+    Iterator result(iter + offset);
+    return result;
+}
+
+template <typename T>
+typename Vector<T>::Iterator Vector<T>::Iterator::operator-(int offset){
+    Iterator result(iter - offset);
+    return result;
 }
 
 #endif
