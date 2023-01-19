@@ -182,7 +182,7 @@ void Vector<T>::Insert(Iterator iter2, T data){
     // insert 100 to index 0
     // 100 1 2 3 4 5
     auto temp = iter2;
-    for(iter2=End(); iter2>= temp; iter2--){
+    for(iter2=End(); iter2>=temp; iter2--){
         *(iter2 + 1) = *(iter2); //temp之後的都要往後移
     }
     *(temp) = data;
