@@ -1,8 +1,7 @@
-#ifndef DOUBLE_LINKED_LIST_H_INCLUDED
-#define DOUBLE_LINKED_LIST_H_INCLUDED
+#ifndef CIRCULAR_LINKED_LIST_H_INCLUDED
+#define CIRCULAR_LINKED_LIST_H_INCLUDED
 
 #include <iostream>
-#include "Function.h"
 using namespace std;
 
 //節點結構
@@ -18,7 +17,7 @@ template <typename T>
 class Linked_List{
     private:
         Node<T>* Head; //去方向第一個節點
-        Node<T>* Tail; //返回方向的第一個節點
+        int Len;
 
     public:
         //迭代器類別
@@ -39,77 +38,85 @@ class Linked_List{
                 bool operator==(Iterator); //Iterator==
                 bool operator!=(Iterator); //Iterator!=
                 T& operator*(); //取值運算子
+                /*
                 Iterator operator+(int); //迭代器的指標(iter)直接 + 一個數字
                 Iterator operator-(int); //迭代器的指標(iter)直接 - 一個數字
+                */
         };
 
         //methods
         Linked_List(); //建構式
+        /*
         void Print_List(); //印出所有資料
         int Search_List(T); //在linked list內找尋特定資料
         void Push_Front(T); //新增第一個節點
         void Pop_Front(); //刪除第一個節點
-        void Push_Back(T); //在尾端新增節點
         void Pop_Back(); //刪除最尾端的節點
         void Clear(); //刪除所有資料
         void Reverse(); //反轉鏈結串列
         void Insert(Iterator, const T&); //在特定地方插入資料
         void Erase(Iterator); //刪除特別迭代器裡面的資料
         void Remove(T); //刪除特定的資料
-        Iterator Begin(); //回傳第一個節點的迭代器
         Iterator End(); //回傳最後一個節點的下一個迭代器，即空指標
         Iterator Head_Iter(); //回傳Head
         Iterator Tail_Iter(); //回傳Tail
+        */
+        void Push_Back(T); //在尾端新增節點
+        Iterator Begin(); //回傳第一個節點的迭代器
+        void Rotate(int); //在Circular Linked List中旋轉的節點數
     
     //function
     //template <typename T2> friend typename Linked_List<T2>::Iterator Find(Linked_List<T2> List, T2 data);
 };
 
+
 /*外部函式*/
-template <typename T>
-typename Linked_List<T>::Iterator Find(Linked_List<T> List, T data){
-    typename Linked_List<T>::Iterator null_iter(nullptr); //空迭代器
+// template <typename T>
+// typename Linked_List<T>::Iterator Find(Linked_List<T> List, T data){
+//     typename Linked_List<T>::Iterator null_iter(nullptr); //空迭代器
 
-    //空鏈結
-    if(List.Begin() == nullptr){
-        return null_iter;
-    }
+//     //空鏈結
+//     if(List.Begin() == nullptr){
+//         return null_iter;
+//     }
 
-    auto current(List.Begin());
-    while(current != null_iter){
-        if(*current == data){
-            return current;
-        }
-        current++;
-    }
-    return current; //若都沒有找到，則回傳一個空的current
-}
+//     auto current(List.Begin());
+//     while(current != null_iter){
+//         if(*current == data){
+//             return current;
+//         }
+//         current++;
+//     }
+//     return current; //若都沒有找到，則回傳一個空的current
+// }
 
 /* Linked List的函式 */
 template <typename T>
 Linked_List<T>::Linked_List(){
     Head = nullptr; //初始化為空指標
-    Tail = nullptr; //初始化為空指標
+    Len = 0;
+    //Tail = nullptr; //初始化為空指標
 }
 
 //印出所有資料
-template <typename T>
-void Linked_List<T>::Print_List(){
-    //空鏈結
-    if(Head == nullptr){
-        cout << "This is an empty linked list." << endl;
-        return;
-    }
+// template <typename T>
+// void Linked_List<T>::Print_List(){
+//     //空鏈結
+//     if(Head == nullptr){
+//         cout << "This is an empty linked list." << endl;
+//         return;
+//     }
 
-    Node<T>* current = Head;
-    cout << "List: ";
-    while(current->Next != nullptr){
-        cout << current->Data << "->";
-        current = current->Next; //往下一個走訪
-    }
-    cout << current->Data << endl; //印出最後一筆資料
-}
+//     Node<T>* current = Head;
+//     cout << "List: ";
+//     while(current->Next != nullptr){
+//         cout << current->Data << "->";
+//         current = current->Next; //往下一個走訪
+//     }
+//     cout << current->Data << endl; //印出最後一筆資料
+// }
 
+/*
 //在linked list內找尋特定資料
 template <typename T>
 int Linked_List<T>::Search_List(T target){
@@ -177,29 +184,37 @@ void Linked_List<T>::Pop_Front(){
     delete Head->Prev;
     Head->Prev = nullptr;
 }
+*/
 
 //在尾端新增節點
 template <typename T>
 void Linked_List<T>::Push_Back(T value){
-    //若是空的，則直接用Push_Front()新增一個新節點
     if(Head == nullptr){
-        Node<T>* new_node = new Node<T>;
-        new_node->Data = value;
-        new_node->Prev = nullptr;
-        new_node->Next = nullptr;
-        Head = new_node;
-        Tail = new_node;
-        //Push_Front(value);
+        // Empty;
+        Head = new Node<T>{value, nullptr, nullptr};
+        Head->Next = Head->Prev = Head;
     }
     else{
-        Tail->Next = new Node<T>; //讓Tail指向一個新節點
-        Tail->Next->Data = value;
-        Tail->Next->Prev = Tail;
-        Tail->Next->Next = nullptr;
-        Tail = Tail->Next;
+        // Tail: Head->Prev
+        Node<T> *new_node = new Node<T>{value, Head->Prev, Head};
+        Head->Prev->Next = new_node;
+        Head->Prev = new_node;
+    }
+    Len++;
+}
+
+//旋轉
+template <typename T>
+void Linked_List<T>::Rotate(int offset){
+    if(Head == nullptr)
+        return;
+    offset = offset % Len;
+    for(int i=0;i<offset;i++){
+        Head = Head->Next;
     }
 }
 
+/*
 //刪除最尾端的節點
 template <typename T>
 void Linked_List<T>::Pop_Back(){
@@ -318,6 +333,7 @@ void Linked_List<T>::Remove(T value){
         }
     }
 }
+*/
 
 //回傳第一個節點的迭代器
 template <typename T>
@@ -325,6 +341,7 @@ typename Linked_List<T>::Iterator Linked_List<T>::Begin(){
     return Iterator(Head);
 }
 
+/*
 //回傳最後一個節點的下一個迭代器，即空指標
 template <typename T>
 typename Linked_List<T>::Iterator Linked_List<T>::End(){
@@ -342,6 +359,7 @@ template<typename T>
 typename Linked_List<T>::Iterator Linked_List<T>::Tail_Iter(){
     return Iterator(Tail);
 }
+*/
 
 
 /*迭代器的函式*/
@@ -402,6 +420,7 @@ T& Linked_List<T>::Iterator::operator*(){
     return iter->Data;
 }
 
+/*
 template <typename T>
 typename Linked_List<T>::Iterator Linked_List<T>::Iterator::operator+(int offset){
     Iterator result(iter);
@@ -427,5 +446,6 @@ typename Linked_List<T>::Iterator Linked_List<T>::Iterator::operator-(int offset
     }
     return result;
 }
+*/
 
 #endif
