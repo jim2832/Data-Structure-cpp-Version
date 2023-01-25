@@ -44,9 +44,9 @@ void Linked_List<T>::Print_List(){
     }
 
     Node<T>* current = First;
-    cout << "Data: ";
+    cout << "List: ";
     while(current->Next != 0){
-        cout << current->Data << " ";
+        cout << current->Data << "->";
         current = current->Next; //往下一個走訪
     }
     cout << current->Data << endl; //印出最後一筆資料
@@ -130,6 +130,7 @@ void Linked_List<T>::Push_Back(T value){
 //刪除最尾端的節點
 template <typename T>
 void Linked_List<T>::Pop_Back(){
+    //空鏈結
     if(First == nullptr){
         return;
     }
