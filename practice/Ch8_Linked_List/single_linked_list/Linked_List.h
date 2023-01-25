@@ -45,7 +45,7 @@ void Linked_List<T>::Print_List(){
 
     Node<T>* current = First;
     cout << "List: ";
-    while(current->Next != 0){
+    while(current->Next != nullptr){
         cout << current->Data << "->";
         current = current->Next; //往下一個走訪
     }
@@ -62,7 +62,7 @@ int Linked_List<T>::Search_List(T target){
 
     int index = 0;
     Node<T>* current = First;
-    while(current->Next != 0){
+    while(current->Next != nullptr){
         if(current->Data == target){ //找到
             return index;
         }
