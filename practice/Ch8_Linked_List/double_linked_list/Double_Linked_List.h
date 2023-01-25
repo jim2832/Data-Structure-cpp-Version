@@ -22,6 +22,9 @@ class Linked_List{
     public:
         //迭代器類別
         class Iterator{
+            //friend
+            friend Linked_List;
+
             private:
                 Node<T>* iter; //迭代器指標
 
@@ -49,12 +52,42 @@ class Linked_List{
         void Pop_Back(); //刪除最尾端的節點
         void Clear(); //刪除所有資料
         void Reverse(); //反轉鏈結串列
+        void Insert(Iterator, const T&); //在特定地方插入資料
+        void Erase(Iterator); //刪除特別迭代器裡面的資料
+        void Remove(T); //刪除特定的資料
+        Iterator Begin(); //回傳第一個節點的迭代器
+        Iterator End(); //回傳最後一個節點的下一個迭代器，即空指標
+    
+    //function
+    template <typename T2> friend typename Linked_List<T2>::Iterator Find(Linked_List<T2> List, T2 data);
 };
+
+/*外部函式*/
+template <typename T>
+typename Linked_List<T>::Iterator Find(Linked_List<T> List, T data){
+    typename Linked_List<T>::Iterator null_iter(nullptr); //空迭代器
+
+    //空鏈結
+    if(List.Head == nullptr){
+        return null_iter;
+    }
+
+    typename Linked_List<T>::Iterator current(List.Head);
+    typename Linked_List<T>::Iterator tail_iter(List.Tail);
+    while(current != null_iter){
+        if(*current == data){
+            return current;
+        }
+        current++;
+    }
+    return current; //若都沒有找到，則回傳一個空的current
+}
 
 /* Linked List的函式 */
 template <typename T>
 Linked_List<T>::Linked_List(){
     Head = nullptr; //初始化為空指標
+    Tail = nullptr; //初始化為空指標
 }
 
 //印出所有資料
@@ -104,28 +137,43 @@ int Linked_List<T>::Search_List(T target){
 //新增第一個節點
 template <typename T>
 void Linked_List<T>::Push_Front(T value){
-    Node<T>* new_node = new Node<T>(); //生成一個新節點(要新增的)
-    new_node->Data = value;
-    new_node->Next = Head;
-    Head = new_node;
-
-    //另一種寫法
-    /*
-    Node<T>* new_node = new Node<T>{value, Head};
-    Head = new_node;
-    */
+   //若是空的，則直接用Push_Front()新增一個新節點
+    if(Head == nullptr){
+        Node<T>* new_node = new Node<T>;
+        new_node->Data = value;
+        new_node->Prev = nullptr;
+        new_node->Next = nullptr;
+        Head = new_node;
+        Tail = new_node;
+        //Push_Front(value);
+    }
+    else{
+        Head->Prev = new Node<T>;
+        Head->Prev->Data = value;
+        Head->Prev->Prev = nullptr;
+        Head->Prev->Next = Head;
+        Head = Head->Prev;
+    }
 }
 
 //刪除第一個節點
 template <typename T>
 void Linked_List<T>::Pop_Front(){
-    //檢查是否為空鏈結
+    //若此是空的鏈結串列
     if(Head == nullptr){
         return;
     }
-    Node<T>* temp = Head;
+    //此鏈結串列只有一筆資料
+    if(Head == Tail){
+        delete Head;
+        Head = Tail = nullptr;
+        return;
+    }
+
+    //兩筆以上的資料
     Head = Head->Next;
-    delete temp;
+    delete Head->Prev;
+    Head->Prev = nullptr;
 }
 
 //在尾端新增節點
@@ -135,6 +183,7 @@ void Linked_List<T>::Push_Back(T value){
     if(Head == nullptr){
         Node<T>* new_node = new Node<T>;
         new_node->Data = value;
+        new_node->Prev = nullptr;
         new_node->Next = nullptr;
         Head = new_node;
         Tail = new_node;
@@ -143,6 +192,7 @@ void Linked_List<T>::Push_Back(T value){
     else{
         Tail->Next = new Node<T>; //讓Tail指向一個新節點
         Tail->Next->Data = value;
+        Tail->Next->Prev = Tail;
         Tail->Next->Next = nullptr;
         Tail = Tail->Next;
     }
@@ -159,6 +209,7 @@ void Linked_List<T>::Pop_Back(){
     if(Head == Tail){
         delete Tail;
         Head = Tail = nullptr;
+        return;
     }
 
     //兩筆以上的資料
@@ -204,6 +255,80 @@ void Linked_List<T>::Reverse(){
     current->Prev = preceding;
     Head = current;
 }
+
+//在特定地方插入資料
+template <typename T>
+void Linked_List<T>::Insert(Iterator it, const T& value){
+    //示例
+    // A B, B is provided by user = it
+    // A C B
+    // TODO: Cannot use to push front.
+    // TODO: Cannot use to push tail.
+    if(it == Begin()){
+        Push_Front(value);
+        return;
+    }
+    if(it == End()){
+        Push_Back(value);
+        return;
+    }
+    Node<T> *new_node = new Node<T>(value, it.iter->Prev, it.iter);
+    it.iter->Prev->Next = new_node; // A -> Next = C
+    it.iter->Prev = new_node; // B -> Prev = C
+}
+
+//刪除特別迭代器裡面的資料
+template <typename T>
+void Linked_List<T>::Erase(Iterator it){
+    // A B C, B is provided by user = it
+    // A C
+    // TODO: Cannot use to erase front.
+    // TODO: Cannot use to erase tail.
+    if(it == Begin()){
+        Pop_Front(value);
+        return;
+    }
+    if(it == End()){
+        Pop_Back(value);
+        return;
+    }
+    it.iter->Prev->Next = it.iter->Next; // A -> Next = C
+    it.iter->Next->Prev = it.iter->Prev; // C -> Prev = A
+    delete it.iter;
+}
+
+//刪除特定的資料
+template <typename T>
+void Linked_List<T>::Remove(T value){
+    for(auto iter=Begin(); iter!=End(); iter++){
+        // A B C, delete B
+        // A C, let iterator = A
+        if(*iter == value){
+            if(iter == Begin()){
+                Pop_Front();
+            }
+            else{
+                auto temp = iter;
+                temp--;
+                Erase(iter);
+                iter = temp;
+            }
+        }
+    }
+}
+
+//回傳第一個節點的迭代器
+template <typename T>
+typename Linked_List<T>::Iterator Linked_List<T>::Begin(){
+    return Iterator(Head);
+}
+
+//回傳最後一個節點的下一個迭代器，即空指標
+template <typename T>
+typename Linked_List<T>::Iterator Linked_List<T>::End(){
+    return Iterator(nullptr);
+}
+
 
 /*迭代器的函式*/
 template <typename T>
