@@ -139,7 +139,7 @@ int Linked_List<T>::Search_List(T target){
 //新增第一個節點
 template <typename T>
 void Linked_List<T>::Push_Front(T value){
-   //若是空的，則直接用Push_Front()新增一個新節點
+    //若是空的，則直接用Push_Front()新增一個新節點
     if(Head == nullptr){
         Node<T>* new_node = new Node<T>;
         new_node->Data = value;
