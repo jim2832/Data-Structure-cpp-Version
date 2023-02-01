@@ -71,7 +71,7 @@ class MyLinkedList{
             else{
                 // A B C => A D B C
                 ListNode* current = head;
-                for(i=1; i<index; i++){
+                for(int i=1; i<index; i++){
                     current = current->next;
                 }
                 ListNode* temp = current->next; //紀錄B以防丟失資料
@@ -102,7 +102,7 @@ class MyLinkedList{
             // A B C D, delete C, current->B
             // 要移動index - 1次
             ListNode* current = head;
-            for(i=1; i<index; i++){
+            for(int i=1; i<index; i++){
                 current = current->next;
             }
             //如果刪除的是最後一筆資料
