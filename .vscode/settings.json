@@ -6,6 +6,7 @@
         "vector": "cpp",
         "list": "cpp",
         "__debug": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "ostream": "cpp"
     }
 }
