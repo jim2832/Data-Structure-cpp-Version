@@ -8,6 +8,7 @@
         "__debug": "cpp",
         "stack": "cpp",
         "ostream": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "deque": "cpp"
     }
 }

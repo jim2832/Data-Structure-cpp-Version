@@ -5,7 +5,7 @@ using namespace std;
 
 class Solution{
     public:
-        int calcualte(string s){
+        int calculate(string s){
             stack<int> numbers; //存值
             stack<int> signs; //存運算元 //+1表示+ -1表示-
             long long int value = 0;
@@ -15,7 +15,7 @@ class Solution{
 
             for(char c:s){
                 //數字(運算元)
-                if(c>= 0 && c <= 9){
+                if(c>= '0' && c <= '9'){
                     value = value * 10 + c - '0'; //char轉int '9' -> 9
                 }
                 //左括號
@@ -39,15 +39,15 @@ class Solution{
                 else if(c == '+'){
                     // a + b + c
                     result += sign * value;
-                    value = 0;
                     sign = 1;
+                    value = 0;
                 }
                 // -運算子
                 else if(c == '-'){
                     // a + b + c
                     result += sign * value;
-                    value = 0;
                     sign = -1;
+                    value = 0;
                 }
             }
             if(value){
