@@ -11,12 +11,13 @@ class MinStack{
         }
 
         void push(int val){
-            if(min.empty(())){
+            data.push(val);
+
+            if(min.empty()){
                 min.push(val);
                 return;
             }
 
-            data.push(val);
             int current_min = min.top();
 
             if(val < current_min){

@@ -21,7 +21,7 @@ class MyLinkedList{
         
         int get(int index){
             //例外處理
-            if(index <= len){
+            if(index >= len){
                 return -1;
             }
 
@@ -56,7 +56,7 @@ class MyLinkedList{
         
         void addAtIndex(int index, int val){
             //違法動作
-            if(index >= len){
+            if(index > len){
                 return;
             }
             //代表在尾端新增資料
@@ -75,7 +75,7 @@ class MyLinkedList{
                     current = current->next;
                 }
                 ListNode* temp = current->next; //紀錄B以防丟失資料
-                current->next = new ListNode(val, temp); //指向新的節點
+                current->next = new ListNode{val, temp}; //指向新的節點
                 len++;
             }
         }
