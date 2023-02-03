@@ -7,6 +7,7 @@
         "list": "cpp",
         "__debug": "cpp",
         "stack": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "queue": "cpp"
     }
 }
