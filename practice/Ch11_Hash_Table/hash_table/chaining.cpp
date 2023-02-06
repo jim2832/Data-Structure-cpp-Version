@@ -1,5 +1,7 @@
 #include <iostream>
 #include <math.h>
+#include <vector>
+#include <list>
 #include <stdlib.h>
 using namespace std;
 
@@ -14,7 +16,7 @@ template <typename T1, typename T2>
 class Unordered_Map{
     private:
         int len; //陣列大小
-        Data<T1,T2>* Pointer; //指向結構的指標
+        vector<list<Data<T1,T2>>> data; //存linked list 的 vector
         int Hash_Function_Div(T1);
         int Hash_Function_Mul(T1);
 
@@ -27,7 +29,7 @@ class Unordered_Map{
 template <typename T1, typename T2>
 Unordered_Map<T1,T2>::Unordered_Map(int m){
     len = m;
-    Pointer = (Data<T1,T2>*)malloc(sizeof(Data<T1,T2>) * len);
+    data.resize(m);
 }
 
 //利用除法
@@ -60,23 +62,26 @@ int Unordered_Map<T1,T2>::Hash_Function_Mul(T1 input){
 template <typename T1, typename T2>
 T2& Unordered_Map<T1,T2>::operator[](T1 input){
     int index = Hash_Function_Mul(input);
-    Pointer[index].Key = input;
-    return Pointer[index].Value;
+    //data[index]: linked list
+    for(auto iter=data[index].begin(); iter!=data[index].end(); iter++){
+        //若有找到相符的Key則直接輸出他的Value
+        if((*iter).Key == input){
+            return (*iter).Value;
+        }
+    }
+    //若沒找到則在linked list尾端新增資料
+    data[index].push_back(Data<T1,T2>{input, 0});
+    return data[index].back().Value;
 }
 
 int main(void){
-    string str;
-    cout << "Please enter a string: ";
-    cin >> str;
-    int number;
-    cout << "Please enter a number: ";
-    cin >> number;
-
     Unordered_Map<string,int> balance;
     balance["Jim"] = 50;
     balance["Sam"] = 100;
 
-    //cout << balance["Jim"];
+    balance["Jim"] += 50;
+
+    cout << balance["Jim"] << endl << balance["Sam"] << endl;
 
     return 0;
 }
