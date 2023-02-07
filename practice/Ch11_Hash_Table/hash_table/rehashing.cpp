@@ -11,7 +11,7 @@ struct Data{
     T2 Value;
 };
 
-// Balance["Jim"]
+// hash table
 template <typename T1, typename T2>
 class Unordered_Map{
     private:
@@ -21,7 +21,7 @@ class Unordered_Map{
         int Hash_Function_Div(T1);
         int Hash_Function_Mul(T1);
         void Rehashing();
-
+        
     public:
         Unordered_Map(int = 128); //建構式
         T2& operator[](T1); //重載[]

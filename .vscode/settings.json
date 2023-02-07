@@ -10,6 +10,9 @@
         "ostream": "cpp",
         "queue": "cpp",
         "deque": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "unordered_map": "cpp",
+        "array": "cpp",
+        "string_view": "cpp"
     }
 }
