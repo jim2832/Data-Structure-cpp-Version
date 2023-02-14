@@ -13,6 +13,7 @@
         "random": "cpp",
         "unordered_map": "cpp",
         "array": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "ios": "cpp"
     }
 }
