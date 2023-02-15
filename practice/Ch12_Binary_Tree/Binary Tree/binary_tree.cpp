@@ -46,7 +46,7 @@ void Binary_Tree<T>::Print(Node<T> node){
 
 //插入節點
 template <typename T>
-//target:頂點的編號(index) value:頂點的值(data)
+// target:頂點的編號(index) value:頂點的值(data)
 bool Binary_Tree<T>::Insert(int target, T value){
     //空樹
     if(root == nullptr){
