@@ -25,8 +25,8 @@ class Solution{
                 return 0;
             }
 
-            int max_left = calculate(root->left, max); //max_left: 左子樹的最大高度
-            int max_right = calculate(root->right, max); //max_right: 右子樹的最大高度
+            int max_left = calculate(root->left, max); //左子樹的最大高度
+            int max_right = calculate(root->right, max); //右子樹的最大高度
 
             //比較 max 和 max_left + max_right
             max = max > max_left+max_right?max:max_left+max_right;
