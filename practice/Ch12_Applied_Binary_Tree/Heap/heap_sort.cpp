@@ -76,7 +76,8 @@ void Heap_Sort(int *arr, int len){
     Build_Max_Heap(arr, len);
 
     for(int i=len-1; i>0; i--){
-        //步驟2: 交換 arr[0] 和 arr[i] (把當前位置的節點和跟節點互換)
+        //步驟2: 交換 arr[0] 和 arr[i] (把當前位置的節點和根節點互換) (arr[0]代表是最大值)
+        //把最大值(root)換到最後一個節點
         int temp = arr[0];
         arr[0] = arr[i];
         arr[i] = temp;

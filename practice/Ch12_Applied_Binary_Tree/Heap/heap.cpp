@@ -29,23 +29,23 @@ void Min_Heapify(int *data, int root, int len){ //陣列開始點、樹根、陣
     int left = 2 * root + 1; //左子點
     int right = 2 * root + 2; //右子點
 
-    int samllest = root;
+    int smallest = root;
 
-    //若左子點在陣列內 且 這個資料比上面的節點大 則更新
-    if(left < len && data[left] < data[samllest]){
-        samllest = left;
+    //若左子點在陣列內 且 這個資料比上面的節點小 則更新
+    if(left < len && data[left] < data[smallest]){
+        smallest = left;
     }
-    //若右子點在陣列內 且 這個資料比上面的節點大 則更新
-    if(right < len && data[right] < data[samllest]){
-        samllest = right;
+    //若右子點在陣列內 且 這個資料比上面的節點小 則更新
+    if(right < len && data[right] < data[smallest]){
+        smallest = right;
     }
-    //若目前的樹根並不是最大值 (不符合Max-Heap)
-    if(samllest != root){
-        //把 data[root] 和 data[samllest] 互換
+    //若目前的樹根並不是最小值 (不符合Min-Heap)
+    if(smallest != root){
+        //把 data[root] 和 data[smallest] 互換
         int temp = data[root];
-        data[root] = data[samllest];
-        data[samllest] = temp;
-        Min_Heapify(data, samllest, len); //因為原本 data[samllest] 的節點有被更動過，則其底下的子樹也要做Heapify
+        data[root] = data[smallest];
+        data[smallest] = temp;
+        Min_Heapify(data, smallest, len); //因為原本 data[smallest] 的節點有被更動過，則其底下的子樹也要做Heapify
     }
 }
 
