@@ -59,12 +59,8 @@ void Huffman_Tree::Clear_Queue(){
 }
 
 //插入節點
-void Huffman_Tree::Insert(char c, int freqency){
-    Node* temp = new Node;
-    temp->character = c;
-    temp->counts = freqency;
-    temp->left = nullptr;
-    temp->right = nullptr;
+void Huffman_Tree::Insert(char c, int frequency){
+    Node* temp = new Node{c, frequency, nullptr, nullptr};
     all_nodes.push(temp);
 }
 
@@ -79,11 +75,7 @@ void Huffman_Tree::Build_Huffman_Tree(){
         else{
             Node* second_min_node = Pop_Node();
             int new_frequency = min_node->counts + second_min_node->counts;
-            Node* temp = new Node;
-            temp->character = '\0';
-            temp->counts = new_frequency;
-            temp->left = min_node;
-            temp->right = second_min_node;
+            Node* temp = new Node{'\0', new_frequency, min_node, second_min_node};
             all_nodes.push(temp);
         }
     }
